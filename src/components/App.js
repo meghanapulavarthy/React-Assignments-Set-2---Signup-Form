@@ -1,59 +1,160 @@
 import React, { Component, useState } from "react";
-import { useForm } from "react-hook-form";
-// import errors from "./ErrorMessage";
+
 import "../styles/App.css";
 
-const App = () => {
-  const { register, handleSubmit, errors } = useForm();
+class RegisterForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: "",
+      email: "",
+      number: "",
+      password: "",
+      gender: "male",
+      errorsMessage: "",
+      userName: ""
+    };
+  }
 
-  const onSubmit = (data) => {
-    // alert(JSON.stringify(data));
-    console.log(data);
+  handleChange = (event) => {
+    if (event.target.name === "gender") {
+      this.setState({ [event.target.name]: event.target.value.toLowerCase() });
+      return;
+    } else {
+      this.setState({ [event.target.name]: event.target.value });
+      return;
+    }
   };
 
-  return (
-    <div id="main">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label>Name:</label>
-        <input name="name" ref={register({ required: true })} />
-        {errors.name?.type === "required" && "All fields are mandatory"}
-        <br />
-        <label>Email:</label>
-        <input name="email" ref={register({ required: true })} />
-        {errors.name?.type === "required" && "All fields are mandatory"}
-        <br />
-        <label>Gender Selection:</label>
-        <select name="gender" ref={register({ required: true })}>
-          <option value="male" default>
-            Male
-          </option>
-          <option value="female">Female</option>
-          <option value="others">Others</option>
-        </select>
-        <br />
-        {errors.name?.type === "required" && "All fields are mandatory"}
-        <label>Phone Number:</label>
-        <input
-          type="number"
-          name="phoneNumber"
-          ref={register({ required: true })}
-        />
-        {errors.name?.type === "required" && "All fields are mandatory"}
-        <br />
-        <label>Password:</label>
-        <input
-          type="password"
-          name="password"
-          ref={register({ required: true, minLength: 6 })}
-        />
-        {errors.name?.type === "required" && "All fields are mandatory"}
-        {errors.name?.type === "minLength" &&
-          "Password must contain atleast 6 letters"}
-        <br />
-        <input type="submit" />
-      </form>
-    </div>
-  );
-};
+  handleSubmit = (event) => {
+    event.preventDefault();
+    const valid = /^([a-zA-Z0-9 _-]+)$/;
+    const other = /^\d+$/;
 
-export default App;
+    if (
+      this.state.name === "" ||
+      this.state.email === "" ||
+      this.state.gender === "" ||
+      this.state.number === "" ||
+      this.state.password === ""
+    ) {
+      this.setState({ errorMessage: "All fields are mandatory", userName: "" });
+      return;
+    }
+    if (!valid.test(this.state.name)) {
+      this.setState({ errorMessage: "Name is not alphanumeric", userName: "" });
+      return;
+    }
+    if (this.state.email.indexOf("@") < 1) {
+      this.setState({ errorMessage: "Email must contain @", userName: "" });
+      return;
+    }
+    if (
+      !(
+        this.state.gender === "male" ||
+        this.state.gender === "female" ||
+        this.state.gender === "others"
+      )
+    ) {
+      this.setState({
+        errorMessage: "Please identify as male, female or others",
+        userName: ""
+      });
+      return;
+    }
+
+    if (!validother.test(this.state.number)) {
+      this.setState({
+        errorMessage: "Phone Number must contain only numbers",
+        userName: ""
+      });
+      return;
+    }
+    if (this.state.password.length < 6) {
+      this.setState({
+        errorMessage: "Password must contain atleast 6 letters",
+        userName: ""
+      });
+      return;
+    }
+
+    const user = this.state.email.substring(0, this.state.email.indexOf("@"));
+    this.setState({
+      userName: user,
+      errorMessage: "",
+      name: "",
+      email: "",
+      gender: "male",
+      number: "",
+      password: ""
+    });
+  };
+
+  render() {
+    return (
+      <div className="form-wraper">
+        <h1>Register Form</h1>
+        {this.state.errorMessage && <div>{this.state.errorMessage}</div>}
+        {this.state.userName && <div>Hello {this.state.userName}</div>}
+
+        <div className="name-field">
+          <input
+            type="text"
+            data-testid="name"
+            name="name"
+            placeholder="name"
+            value={this.state.name}
+            onChange={this.handleChange}
+          />
+        </div>
+        <div className="email-field">
+          <input
+            type="text"
+            data-testid="email"
+            name="email"
+            placeholder="Email"
+            value={this.state.email}
+            onChange={this.handleChange}
+          />
+        </div>
+        <div className="Gender-field">
+          <input
+            data-testid="gender"
+            type="text"
+            name="gender"
+            placeholder="genger"
+            value={this.state.gender}
+            onChange={this.handleChange}
+          />
+        </div>
+        <div className="number-field">
+          <input
+            type="text"
+            data-testid="phoneNumber"
+            name="number"
+            placeholder="PhoneNumber"
+            value={this.state.number}
+            onChange={this.handleChange}
+          />
+        </div>
+        <div className="password-field">
+          <input
+            data-testid="password"
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={this.state.password}
+            onChange={this.handleChange}
+          />
+        </div>
+        <div className="submit-field">
+          <button data-testid="submit" onClick={this.handleSubmit}>
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default RegisterForm;
